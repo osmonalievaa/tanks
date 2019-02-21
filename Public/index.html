@@ -6,6 +6,7 @@
         <style>
             body { margin: 0; overflow: hidden; }
         </style>
+        <script src="/socket.io/socket.io.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', () => {
                 const canvas = document.getElementById('canvas')
@@ -19,6 +20,7 @@
     <body>
         <canvas id="canvas"></canvas>
         <script>
+            let socket
             const fieldWidth = 20
             const fieldHeight = 20
 
@@ -72,7 +74,8 @@
             }
 
             function setup(ctx, w, h) {
-                //РєРѕРґ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
+                socket = io()
+                //код инициализации
                 cellSize = Math.min(w / fieldWidth, h / fieldHeight) / 2
                 fieldScreenWidth = fieldWidth * cellSize
                 fieldScreenHeight = fieldHeight * cellSize
@@ -88,7 +91,7 @@
                 ctx.rect(0, 0, w, h)
                 ctx.fill()
                 
-                // РєРѕРґ СЂРёСЃРѕРІР°РЅРёСЏ РїРѕР»СЏ
+                // код рисования поля
                 for (let y = 0; y < fieldHeight; ++y) {
                     for (let x = 0; x < fieldWidth; ++x) {
                         const screenX = fieldCenterShiftX + x * cellSize
@@ -100,7 +103,7 @@
                     }
                 }
                 
-                // РєРѕРґ СЂРёСЃРѕРІР°РЅРёСЏ РёРіСЂРѕРІС‹С… РѕР±СЉРµРєС‚РѕРІ
+                // код рисования игровых объектов
                 for(const [_, gameObject] of Object.entries(gameObjects)) {
                     const screenX = fieldCenterShiftX + gameObject.x * cellSize
                     const screenY = fieldCenterShiftY + gameObject.y * cellSize
@@ -113,7 +116,16 @@
                 window.requestAnimationFrame(timestamp => draw(ctx, w, h, timestamp));
             }
             function keyDown(key) {
-                // TODO: РґРѕР±Р°РІРёС‚СЊ РєРѕРґ РѕР±СЂР°Р±РѕС‚РєРё РЅР°Р¶Р°С‚РёСЏ РЅР° РєР»Р°РІРёС€Рё
+                //код обработки нажатия на клавиши
+                switch (key) {
+                    case 'w':
+                    case 'a':
+                    case 's':
+                    case 'd':
+                    case ' ':
+                        socket.emit('cmd', key);
+                        break
+                }
             }
         </script>
     </body>
